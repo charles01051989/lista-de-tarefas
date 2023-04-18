@@ -1,19 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskService {
-  tasks: Task[]
-  findAll() {
-    return this.tasks;
+  constructor(private readonly prisma: PrismaService) {}
+
+  findAll(): Promise<Task[]> {
+    return this.prisma.task.findMany();
   }
 
-  create(createTaskDto: CreateTaskDto) {
-    const task: Task = { id: 'random_id', ...createTaskDto };
+  findOne(id: string): Promise<Task> {
+    return this.prisma.task.findUnique({ where: { id }});
+  }
 
-    this.tasks.push(task);
+  create(dto: CreateTaskDto): Promise<Task> {
+    const data: Task = { ...dto };
 
-    return task;
+    return this.prisma.task.create({ data });
   }
 }

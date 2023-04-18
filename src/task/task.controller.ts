@@ -1,19 +1,35 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { TaskService } from './task.service';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { Task } from './entities/task.entity';
+import { TaskService } from './task.service';
 
 @ApiTags('task')
 @Controller('task')
 export class TaskController {
-  constructor(private taskService: TaskService){}
+  constructor(private readonly taskService: TaskService) {}
 
   @Get()
-  findAll() {
+  @ApiOperation({
+    summary: 'Listar todas as tarefas',
+  })
+  findAll(): Promise<Task[]> {
     return this.taskService.findAll();
   }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Visualizar uma tarefa',
+  })
+  findOne(@Param('id') id: string): Promise<Task> {
+    return this.taskService.findOne(id);
+  }
+
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  @ApiOperation({
+    summary: 'Criar uma tarefa',
+  })
+  create(@Body() dto: CreateTaskDto): Promise<Task> {
+    return this.taskService.create(dto);
   }
 }

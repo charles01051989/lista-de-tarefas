@@ -8,4 +8,16 @@ export class CreateTaskDto {
     example: ' Fazer teste...'
   })
   name: string;
+  @IsString()
+  @ApiProperty({
+    description: 'Tipo da tarefa',
+    example: ' Urgente...'
+  })
+  type: string;
+  @IsString()
+  @ApiProperty({
+    description: 'Conteúdo da tarefa',
+    example: 'Detalhamento...'
+  })
+  content: string;
 }

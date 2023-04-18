@@ -11,7 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model TASK {
+model task {
   id        String   @id @default(uuid())
   name      String
   type      String
