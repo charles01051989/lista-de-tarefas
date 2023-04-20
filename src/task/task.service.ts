@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
@@ -12,8 +12,18 @@ export class TaskService {
     return this.prisma.task.findMany();
   }
 
-  findOne(id: string): Promise<Task> {
-    return this.prisma.task.findUnique({ where: { id } });
+  async findById(id: string): Promise<Task> {
+    const record = await this.prisma.task.findUnique({ where: { id } });
+
+    if (!record) {
+      throw new NotFoundException(`Registro com o ID '${id}' não encontrado.`);
+    }
+
+    return record;
+  }
+
+  async findOne(id: string): Promise<Task> {
+    return this.findById(id);
   }
 
   create(dto: CreateTaskDto): Promise<Task> {
@@ -22,11 +32,21 @@ export class TaskService {
     return this.prisma.task.create({ data });
   }
 
-  update(id: string, dto: UpdateTaskDto): Promise<Task> {
+  async update(id: string, dto: UpdateTaskDto): Promise<Task> {
+    await this.findById(id);
+
     const data: Partial<Task> = { ...dto };
+
     return this.prisma.task.update({
       where: { id },
       data,
     });
+  }
+
+  async delete(id: string) {
+
+    await this.findById(id)
+    
+    await this.prisma.task.delete({ where: { id } });
   }
 }

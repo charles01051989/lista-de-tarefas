@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
@@ -41,4 +41,14 @@ export class TaskController {
   update(@Param('id') id: string, @Body() dto: UpdateTaskDto): Promise<Task> {
     return this.taskService.update(id, dto);
   }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Remover uma tarefa pelo ID'
+  })
+  delete(@Param('id') id: string){
+    this.taskService.delete(id)
+  }
+
 }
