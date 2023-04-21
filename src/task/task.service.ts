@@ -1,52 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { handleError } from 'src/utils/handle-error.util';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
-import { UpdateTaskDto } from './dto/update-task.dto';
 
-@Injectable()
 export class TaskService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): Promise<Task[]> {
-    return this.prisma.task.findMany();
+  create(createTaskDto: CreateTaskDto): Promise<Task> {
+
+
+    const data: Prisma.TaskCreateInput = {
+
+      content: createTaskDto.content,
+      name: createTaskDto.content,
+
+      user: {
+        connect: {
+          id: createTaskDto.userId,
+        },
+      },
+      type: {
+        connect: {
+          id: createTaskDto.typeId,
+        },
+      },
+    };
+
+    return this.prisma.task.create({ data }).catch(handleError)
   }
-
-  async findById(id: string): Promise<Task> {
-    const record = await this.prisma.task.findUnique({ where: { id } });
-
-    if (!record) {
-      throw new NotFoundException(`Registro com o ID '${id}' não encontrado.`);
-    }
-
-    return record;
-  }
-
-  async findOne(id: string): Promise<Task> {
-    return this.findById(id);
-  }
-
-  create(dto: CreateTaskDto): Promise<Task> {
-    const data: Task = { ...dto };
-
-    return this.prisma.task.create({ data });
-  }
-
-  async update(id: string, dto: UpdateTaskDto): Promise<Task> {
-    await this.findById(id);
-
-    const data: Partial<Task> = { ...dto };
-
-    return this.prisma.task.update({
-      where: { id },
-      data,
+  findAll() {
+    return this.prisma.task.findMany({
+      select: {
+        name: true,
+        type: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
   }
 
-  async delete(id: string) {
-
-    await this.findById(id)
-    
-    await this.prisma.task.delete({ where: { id } });
+  findOne(id: string) {
+    return this.prisma.task.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        type: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
   }
 }

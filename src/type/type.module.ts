@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TaskController } from './task.controller';
-import { TaskService } from './task.service';
+import { TypeService } from './type.service';
+import { TypeController } from './type.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [PrismaModule, PassportModule.register({ defaultStrategy: 'jwt' })],
-  controllers: [TaskController],
-  providers: [TaskService],
+  controllers: [TypeController],
+  providers: [TypeService]
 })
-export class TaskModule {}
+export class TypeModule {}

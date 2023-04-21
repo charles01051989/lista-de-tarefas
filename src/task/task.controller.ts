@@ -1,54 +1,37 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { Task } from './entities/task.entity';
 import { TaskService } from './task.service';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('task')
+@UseGuards(AuthGuard())
+@ApiBearerAuth()
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
+  @Post()
+  @ApiOperation({
+    summary: 'Criar um pedido',
+  })
+  create(@Body() createTaskDto: CreateTaskDto ){
+    return this.taskService.create(createTaskDto)
+  }
+
   @Get()
   @ApiOperation({
-    summary: 'Listar todas as tarefas',
+    summary: 'Listar todos os pedidos',
   })
-  findAll(): Promise<Task[]> {
+  findAll() {
     return this.taskService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Visualizar uma tarefa',
+    summary: 'Visualizar um pedido pelo ID',
   })
-  findOne(@Param('id') id: string): Promise<Task> {
+  findOne(@Param('id') id: string) {
     return this.taskService.findOne(id);
   }
-
-  @Post()
-  @ApiOperation({
-    summary: 'Criar uma tarefa',
-  })
-  create(@Body() dto: CreateTaskDto): Promise<Task> {
-    return this.taskService.create(dto);
-  }
-
-  @Patch(':id')
-  @ApiOperation({
-    summary: 'Editar uma mesa pelo ID',
-  })
-  update(@Param('id') id: string, @Body() dto: UpdateTaskDto): Promise<Task> {
-    return this.taskService.update(id, dto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({
-    summary: 'Remover uma tarefa pelo ID'
-  })
-  delete(@Param('id') id: string){
-    this.taskService.delete(id)
-  }
-
 }

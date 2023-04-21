@@ -13,8 +13,10 @@ async function bootstrap() {
     .setDescription('Aplicação para gestão de tarefas')
     .setVersion('1.0.0')
     .addTag('status')
-    .addTag('task')
     .addTag('user')
+    .addTag('type')
+    .addTag('task')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
