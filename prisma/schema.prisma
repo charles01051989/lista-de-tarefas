@@ -12,7 +12,7 @@ datasource db {
 
 model Task {
   id   String @id @default(uuid())
-  name String
+  name String ?
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
@@ -20,7 +20,7 @@ model Task {
   type   Type   @relation(fields: [typeId], references: [id])
   typeId String @map("type_id")
 
-  content   String
+  content   String ?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
